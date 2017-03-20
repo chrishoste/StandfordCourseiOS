@@ -16,14 +16,6 @@ class ViewController: UIViewController {
     
     var isInTheMiddleOfTyping = false
     
-    var displayValue:Double {
-        get {
-            return Double(display.text!)!
-        }
-        set{
-            display.text = String(newValue)
-        }
-    }
     
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
@@ -36,18 +28,40 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func floatingPoint(_ sender: UIButton) {
+        if !isInTheMiddleOfTyping {
+            display.text = "0."
+        } else
+            if display.text?.range(of: ".") == nil {
+                display.text = display.text! + "."
+        }
+        isInTheMiddleOfTyping = true
+        
+    }
+    
+    
+    var displayValue:Double {
+        get {
+            return Double(display.text!)!
+        }
+        set{
+            display.text = String(newValue)
+        }
+    }
+    
+    private var brain = CalculatorBrain()
     
     @IBAction func performOperation(_ sender: UIButton) {
+        if isInTheMiddleOfTyping {
+            brain.setOperand(displayValue)
+            isInTheMiddleOfTyping = false
+        }
         isInTheMiddleOfTyping = false
         if let mathematicalSymbol = sender.currentTitle {
-            switch mathematicalSymbol {
-            case "π":
-                displayValue = Double.pi
-            case "√":
-                displayValue = sqrt(displayValue)
-            default:
-                break
-            }
+            brain.performOperation(mathematicalSymbol)
+        }
+        if let result = brain.result{
+            displayValue = result
         }
     }
     
